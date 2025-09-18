@@ -7,6 +7,10 @@ __pycache__/
 # Pasta de instância do Flask (contém o banco de dados e segredos)
 instance/
 
+# Arquivos de banco de dados
+*.db
+*.sqlite
+
 # Configurações de ambiente virtual
 venv/
 env/

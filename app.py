@@ -39,6 +39,26 @@ def init_db_command():
     init_db()
     print('Initialized the database.')
 
+# --- Auto-initialize database on startup if it doesn't exist (for Render free tier) ---
+def check_db_initialized():
+    """Checks if the database has been initialized by checking for the products table."""
+    db = get_db()
+    try:
+        with db.cursor() as cur:
+            cur.execute("SELECT 1 FROM products LIMIT 1;")
+        return True
+    except psycopg2.Error as e:
+        # "undefined_table" error code
+        if e.pgcode == '42P01':
+            return False
+        raise
+
+with app.app_context():
+    if not check_db_initialized():
+        print("Database tables not found, initializing...")
+        init_db()
+        print("Database initialized.")
+
 # --- Login Decorator ---
 def login_required(f):
     @wraps(f)

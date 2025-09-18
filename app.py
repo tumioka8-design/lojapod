@@ -43,6 +43,13 @@ def init_db_command():
     init_db()
     print('Initialized the database.')
 
+# --- Auto-initialize database on startup if it doesn't exist (for Render free tier) ---
+with app.app_context():
+    if not os.path.exists(app.config['DATABASE']):
+        print("Database not found, initializing...")
+        init_db()
+        print("Database initialized.")
+
 # --- Login Decorator ---
 def login_required(f):
     @wraps(f)

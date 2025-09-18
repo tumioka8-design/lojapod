@@ -5,7 +5,7 @@
     <h1 class="text-4xl font-bold tracking-wide uppercase">{{ category_title or 'Nossos Produtos' }}</h1>
 </div>
 
-<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+<div class="grid grid-cols-2 gap-4 lg:grid-cols-3 xl:grid-cols-4">
     {% for product in products %}
     <!-- Card de Produto -->
     <div class="bg-[#111111] rounded-lg overflow-hidden group transition-transform duration-300 ease-in-out hover:-translate-y-2 shadow-glow flex flex-col">

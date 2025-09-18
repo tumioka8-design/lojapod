@@ -50,6 +50,8 @@ def check_db_initialized():
     except psycopg2.Error as e:
         # "undefined_table" error code
         if e.pgcode == '42P01':
+            # Rollback the failed transaction to allow a new one
+            db.rollback()
             return False
         raise
 

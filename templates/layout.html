@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Draw Vapes{% endblock %}</title>
+    <!-- Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Google Fonts (Poppins) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* Aplicando a fonte Poppins ao corpo da página */
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+        /* Sombra personalizada para um efeito de brilho sutil em fundos escuros */
+        .shadow-glow {
+            box-shadow: 0 0 25px rgba(255, 255, 255, 0.03);
+        }
+        /* Corrige o fundo branco do preenchimento automático do navegador */
+        input:-webkit-autofill,
+        input:-webkit-autofill:hover,
+        input:-webkit-autofill:focus,
+        input:-webkit-autofill:active {
+            -webkit-box-shadow: 0 0 0 30px #374151 inset !important; /* Cor de bg-gray-700 */
+            -webkit-text-fill-color: #fff !important; /* Cor do texto */
+            caret-color: #fff !important; /* Cor do cursor de digitação */
+        }
+
+        /* Efeito de Fumaça */
+        .smoke-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: 9998;
+        }
+        .smoke-particle {
+            position: absolute;
+            bottom: -200px;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0) 70%);
+            border-radius: 50%;
+            opacity: 0;
+            filter: blur(30px);
+            animation: smoke-animation 20s linear infinite;
+        }
+        @keyframes smoke-animation {
+            0% { transform: translate(0, 0) scale(1); opacity: 0; }
+            15% { opacity: 1; }
+            100% { transform: translate(50vw, -120vh) scale(2.5); opacity: 0; }
+        }
+        .smoke-particle:nth-child(1) { width: 150px; height: 150px; left: 5%; animation-delay: 2.5s; animation-duration: 20s; }
+        .smoke-particle:nth-child(2) { width: 250px; height: 250px; left: 20%; animation-delay: 4s; animation-duration: 15s; }
+        .smoke-particle:nth-child(3) { width: 180px; height: 180px; left: -5%; animation-delay: 8s; animation-duration: 25s; }
+        .smoke-particle:nth-child(4) { width: 220px; height: 220px; left: 15%; animation-delay: 12s; animation-duration: 18s; }
+        .smoke-particle:nth-child(5) { width: 160px; height: 160px; left: 30%; animation-delay: 15s; animation-duration: 22s; }
+    </style>
+</head>
+<body class="bg-black text-white flex flex-col min-h-screen">
+
+    <!-- Splash Screen -->
+    <div id="splash-screen" class="fixed inset-0 bg-black flex items-center justify-center z-[9999] transition-opacity duration-1000 ease-in-out">
+        <h1 class="text-4xl font-bold tracking-widest text-white animate-pulse">DRAW VAPES</h1>
+    </div>
+
+    <!-- Efeito de Fumaça -->
+    <div class="smoke-container">
+        <div class="smoke-particle"></div>
+        <div class="smoke-particle"></div>
+        <div class="smoke-particle"></div>
+        <div class="smoke-particle"></div>
+        <div class="smoke-particle"></div>
+    </div>
+
+    <!-- Header/Navbar Fixa -->
+    <header class="fixed top-0 left-0 w-full bg-black/80 backdrop-blur-sm border-b border-gray-800 z-50">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <!-- Logo -->
+            <div class="text-2xl font-bold tracking-wider">
+                <a href="{{ url_for('index') }}" id="logo-link">Draw Vapes</a>
+            </div>
+
+            <!-- Menu Centralizado (escondido em telas pequenas) -->
+            <div class="hidden md:flex justify-center flex-grow">
+                <ul class="flex items-center space-x-8">
+                    <li><a href="{{ url_for('index') }}" class="{% if category_title == 'Todos os Produtos' %}text-white font-semibold{% else %}text-gray-300{% endif %} hover:text-white transition-colors duration-300">Todos</a></li>
+                    <li><a href="{{ url_for('show_category', category_name='Promoções') }}" class="{% if category_title == 'Promoções' %}text-white font-semibold{% else %}text-gray-300{% endif %} hover:text-white transition-colors duration-300">Promoções</a></li>
+                    <li><a href="{{ url_for('show_category', category_name='Pods') }}" class="{% if category_title == 'Pods' %}text-white font-semibold{% else %}text-gray-300{% endif %} hover:text-white transition-colors duration-300">Pods</a></li>
+                    <li><a href="{{ url_for('show_category', category_name='Perfumes') }}" class="{% if category_title == 'Perfumes' %}text-white font-semibold{% else %}text-gray-300{% endif %} hover:text-white transition-colors duration-300">Perfumes</a></li>
+                </ul>
+            </div>
+
+            <!-- Ícones da direita -->
+            <div class="flex items-center space-x-5">
+                <!-- Cart Icon -->
+                <a href="{{ url_for('cart') }}" class="relative text-gray-300 hover:text-white transition-colors duration-300">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" class="bi bi-cart" viewBox="0 0 16 16"><path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5zM3.102 4l1.313 7h8.17l1.313-7H3.102zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/></svg>
+                    {% if session.get('cart') %}
+                    <span class="absolute -top-2 -right-3 flex h-5 w-5 items-center justify-center rounded-full bg-red-600 text-xs font-bold text-white">
+                        {{ session['cart']|length }}
+                    </span>
+                    {% endif %}
+                </a>
+                <!-- Support Icon -->
+                <a href="tel:+5537991224643" class="text-2xl text-gray-300 hover:text-white transition-colors duration-300" title="Suporte">
+                    🎧
+                </a>
+                <!-- Hamburger Button -->
+                <button id="hamburger-button" class="md:hidden text-gray-300 hover:text-white focus:outline-none">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                </button>
+            </div>
+        </nav>
+
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-black/80">
+            <ul class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <li><a href="{{ url_for('index') }}" class="block px-3 py-2 rounded-md text-base font-medium {% if category_title == 'Todos os Produtos' %}text-white bg-gray-700{% else %}text-gray-300 hover:text-white hover:bg-gray-700{% endif %}">Todos</a></li>
+                <li><a href="{{ url_for('show_category', category_name='Promoções') }}" class="block px-3 py-2 rounded-md text-base font-medium {% if category_title == 'Promoções' %}text-white bg-gray-700{% else %}text-gray-300 hover:text-white hover:bg-gray-700{% endif %}">Promoções</a></li>
+                <li><a href="{{ url_for('show_category', category_name='Pods') }}" class="block px-3 py-2 rounded-md text-base font-medium {% if category_title == 'Pods' %}text-white bg-gray-700{% else %}text-gray-300 hover:text-white hover:bg-gray-700{% endif %}">Pods</a></li>
+                <li><a href="{{ url_for('show_category', category_name='Perfumes') }}" class="block px-3 py-2 rounded-md text-base font-medium {% if category_title == 'Perfumes' %}text-white bg-gray-700{% else %}text-gray-300 hover:text-white hover:bg-gray-700{% endif %}">Perfumes</a></li>
+            </ul>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-6 pt-28 pb-12 flex-grow">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-gray-800">
+        <div class="container mx-auto px-6 py-4">
+            <p class="text-center text-gray-500 text-sm">
+                <a href="{{ url_for('login') }}" class="hover:text-white transition-colors" title="Admin Login">&copy;</a> 2024 Draw Vapes. Todos os direitos reservados.
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        const splashScreen = document.getElementById('splash-screen');
+
+        function playSplashScreen(callback) {
+            if (splashScreen) {
+                splashScreen.style.display = 'flex';
+                splashScreen.classList.remove('opacity-0');
+
+                // Wait a moment before starting the fade-out
+                setTimeout(() => {
+                    splashScreen.classList.add('opacity-0');
+                    // After the fade-out animation, hide it completely
+                    setTimeout(() => {
+                        splashScreen.style.display = 'none';
+                        if (callback) callback();
+                    }, 1000); // This duration must match the CSS transition duration
+                }, 1500); // 1.5-second delay before fading
+            }
+        }
+
+        // Run on first visit in a session
+        window.addEventListener('load', () => {
+            if (!sessionStorage.getItem('splashShown')) {
+                playSplashScreen(() => {
+                    sessionStorage.setItem('splashShown', 'true');
+                });
+            } else {
+                splashScreen.style.display = 'none';
+            }
+        });
+
+        // Run on logo click
+        document.getElementById('logo-link').addEventListener('click', function(event) {
+            event.preventDefault();
+            const destination = this.href;
+            playSplashScreen(() => {
+                window.location.href = destination;
+            });
+        });
+
+        // Hamburger menu logic
+        const hamburgerButton = document.getElementById('hamburger-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+
+        hamburgerButton.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+    </script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

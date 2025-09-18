@@ -1,0 +1,99 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<h1 class="text-3xl font-bold mb-8">Seu Carrinho de Compras</h1>
+
+{% if cart_items %}
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+    <!-- Lista de Itens -->
+    <div class="lg:col-span-7">
+        <div class="bg-[#111111] rounded-lg shadow-glow">
+            <div class="p-5">
+                {% for item in cart_items %}
+                <div class="flex justify-between items-center {% if not loop.last %}mb-4 pb-4 border-b border-gray-700{% endif %}">
+                    <div>
+                        <h5 class="text-lg font-semibold">{{ item.name }}</h5>
+                        <p class="text-sm text-gray-400">Sabor: {{ item.flavor }}</p>
+                        <strong class="text-blue-400 mt-1 block">R$ {{ "%.2f"|format(item.price) }}</strong>
+                    </div>
+                    <!-- Botão de remover pode ser adicionado aqui no futuro -->
+                </div>
+                {% endfor %}
+            </div>
+            <div class="flex justify-between items-center bg-[#1c1c1c] p-5 rounded-b-lg">
+                <a href="{{ url_for('clear_cart') }}" class="text-sm text-red-500 hover:text-red-400 transition-colors">Esvaziar Carrinho</a>
+                <div class="text-right">
+                    <span class="text-gray-400">Total:</span>
+                    <strong class="text-2xl ml-2">R$ {{ "%.2f"|format(total_price) }}</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Formulário de Entrega -->
+    <div class="lg:col-span-5">
+        <div class="bg-[#111111] rounded-lg shadow-glow p-5">
+            <h5 class="text-xl font-semibold mb-4">Informações para Entrega</h5>
+            <form id="checkout-form" class="space-y-4">
+                <div>
+                    <label for="full_name" class="block mb-2 text-sm font-medium text-gray-300">Nome Completo</label>
+                    <input type="text" id="full_name" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" required>
+                </div>
+                <div>
+                    <label for="address" class="block mb-2 text-sm font-medium text-gray-300">Endereço Completo</label>
+                    <input type="text" id="address" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="Rua, Número, Bairro, Cidade" required>
+                </div>
+                <button type="submit" class="w-full text-white bg-green-600 hover:bg-green-700 focus:ring-4 focus:outline-none focus:ring-green-800 font-medium rounded-lg text-base px-5 py-3 text-center transition-colors">
+                    Finalizar Compra via WhatsApp
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="text-center py-16 bg-[#111111] rounded-lg shadow-glow">
+    <h2 class="text-3xl font-semibold text-gray-200">Seu carrinho está vazio.</h2>
+    <p class="lead text-gray-400 mt-3">Adicione produtos ao seu carrinho para vê-los aqui.</p>
+    <a href="{{ url_for('index') }}" class="mt-6 inline-block bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded transition-colors">
+        Voltar para a Loja
+    </a>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+{% if cart_items %}
+<script>
+    // Pass server-side data to JavaScript safely, which resolves linter errors.
+    const cartItems = {{ cart_items | tojson }};
+    const totalPrice = {{ total_price }};
+
+    document.getElementById('checkout-form').addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        const fullName = document.getElementById('full_name').value;
+        const address = document.getElementById('address').value;
+        const phoneNumber = '5537991224643'; // Seu número com código do país
+
+        let message = `Olá, Draw Vapes! Gostaria de fazer um pedido:\n\n`;
+        message += '*Itens no Pedido:*\n';
+
+        // Loop through items using pure JavaScript
+        cartItems.forEach(item => {
+            message += `- 1x ${item.name} (Sabor: ${item.flavor})\n`;
+        });
+
+        // Use the JavaScript variable for the total price
+        message += `\n*Total do Pedido:* R$ ${totalPrice.toFixed(2)}\n`;
+        message += `\n*Dados para Entrega:*\n`;
+        message += `- *Nome:* ${fullName}\n`;
+        message += `- *Endereço:* ${address}\n\n`;
+        message += `Aguardo o contato para combinar o pagamento. Obrigado!`;
+
+        const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+
+        window.open(whatsappUrl, '_blank');
+    });
+</script>
+{% endif %}
+{% endblock %}

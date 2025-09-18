@@ -1,0 +1,74 @@
+/* --- Estilo Geral --- */
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #f8f9fa; /* Um cinza bem claro para o fundo */
+    color: #212529;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* --- Títulos --- */
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 700; /* Deixa os títulos mais fortes */
+}
+
+/* --- Cards de Produto --- */
+.card {
+    border: none; /* Remove a borda padrão */
+    border-radius: 12px; /* Cantos mais arredondados */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); /* Sombra sutil para dar profundidade */
+    transition: all 0.3s ease; /* Animação suave para o hover */
+}
+
+.card:hover {
+    transform: translateY(-5px); /* Levanta o card um pouco */
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1); /* Sombra mais forte no hover */
+}
+
+.card-img-top {
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+}
+
+.card-body {
+    padding: 1.5rem;
+}
+
+.card-title {
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+}
+
+.card-text {
+    color: #6c757d; /* Um cinza mais claro para a descrição */
+    font-size: 0.9rem;
+}
+
+.card-footer {
+    background-color: #fff; /* Fundo branco, sem a cor cinza padrão */
+    border-top: 1px solid #f1f1f1; /* Linha divisória bem sutil */
+    border-bottom-left-radius: 12px;
+    border-bottom-right-radius: 12px;
+    padding: 1rem 1.5rem;
+}
+
+.card-footer h4 {
+    margin: 0;
+    font-weight: 700;
+    color: #0d6efd; /* Cor azul do Bootstrap para o preço */
+}
+
+/* --- Botões --- */
+.btn-primary {
+    font-weight: 500;
+    border-radius: 8px;
+}
+
+/* Adiciona um cursor de ponteiro para cards clicáveis */
+.card-clickable {
+    cursor: pointer;
+}

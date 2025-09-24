@@ -3,9 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Draw Vapes{% endblock %}</title>
+    <title>{% block title %}Jesko Brechó{% endblock %}</title>
     <!-- Tailwind CSS via CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        // Configura o Tailwind para usar a estratégia de classe para o modo escuro
+        // Isso permite alternar o tema adicionando/removendo a classe 'dark' no <html>
+        tailwind.config = { darkMode: 'class' };
+    </script>
 
     <!-- Google Fonts (Poppins) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -13,21 +18,22 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;700&display=swap" rel="stylesheet">
 
     <style>
-        /* Aplicando a fonte Poppins ao corpo da página */
         body {
             font-family: 'Poppins', sans-serif;
         }
-        /* Sombra personalizada para um efeito de brilho sutil em fundos escuros */
         .shadow-glow {
-            box-shadow: 0 0 25px rgba(255, 255, 255, 0.03);
+            /* Sombra para modo claro e escuro */
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
         }
-        /* Corrige o fundo branco do preenchimento automático do navegador */
+        .dark .shadow-glow {
+            box-shadow: 0 0 25px rgba(255, 255, 255, 0.04);
+        }
         input:-webkit-autofill,
         input:-webkit-autofill:hover,
         input:-webkit-autofill:focus,
         input:-webkit-autofill:active {
-            -webkit-box-shadow: 0 0 0 30px #374151 inset !important; /* Cor de bg-gray-700 */
-            -webkit-text-fill-color: #fff !important; /* Cor do texto */
+            -webkit-box-shadow: 0 0 0 30px #4b5563 inset !important; /* bg-gray-600 */
+            -webkit-text-fill-color: #fff !important;
             caret-color: #fff !important; /* Cor do cursor de digitação */
         }
 
@@ -63,11 +69,11 @@
         .smoke-particle:nth-child(5) { width: 160px; height: 160px; left: 30%; animation-delay: 15s; animation-duration: 22s; }
     </style>
 </head>
-<body class="bg-black text-white flex flex-col min-h-screen">
+<body class="bg-white text-black dark:bg-black dark:text-white flex flex-col min-h-screen transition-colors duration-300">
 
     <!-- Splash Screen -->
-    <div id="splash-screen" class="fixed inset-0 bg-black flex items-center justify-center z-[9999] transition-opacity duration-1000 ease-in-out">
-        <h1 class="text-4xl font-bold tracking-widest text-white animate-pulse">DRAW VAPES</h1>
+    <div id="splash-screen" class="fixed inset-0 bg-white dark:bg-black flex items-center justify-center z-[9999] transition-opacity duration-1000 ease-in-out">
+        <h1 class="text-4xl font-bold tracking-widest text-black dark:text-white animate-pulse">JESKO BRECHÓ</h1>
     </div>
 
     <!-- Efeito de Fumaça -->
@@ -80,27 +86,31 @@
     </div>
 
     <!-- Header/Navbar Fixa -->
-    <header class="fixed top-0 left-0 w-full bg-black/80 backdrop-blur-sm border-b border-gray-800 z-50">
+    <header class="fixed top-0 left-0 w-full bg-white/80 dark:bg-black/80 backdrop-blur-sm border-b border-gray-200 dark:border-gray-800 z-50 transition-colors duration-300">
         <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
             <!-- Logo -->
             <div class="text-2xl font-bold tracking-wider">
-                <a href="{{ url_for('index') }}">Draw Vapes</a>
+                <a href="{{ url_for('index') }}">Jesko Brechó</a>
             </div>
 
             <!-- Menu Centralizado (escondido em telas pequenas) -->
             <div class="hidden md:flex justify-center flex-grow">
                 <ul class="flex items-center space-x-8">
-                    <li><a href="{{ url_for('index') }}" class="{% if category_title == 'Todos os Produtos' %}text-white font-semibold{% else %}text-gray-300{% endif %} hover:text-white transition-colors duration-300">Todos</a></li>
-                    <li><a href="{{ url_for('show_category', category_name='Promoções') }}" class="{% if category_title == 'Promoções' %}text-white font-semibold{% else %}text-gray-300{% endif %} hover:text-white transition-colors duration-300">Promoções</a></li>
-                    <li><a href="{{ url_for('show_category', category_name='Pods') }}" class="{% if category_title == 'Pods' %}text-white font-semibold{% else %}text-gray-300{% endif %} hover:text-white transition-colors duration-300">Pods</a></li>
-                    <li><a href="{{ url_for('show_category', category_name='Perfumes') }}" class="{% if category_title == 'Perfumes' %}text-white font-semibold{% else %}text-gray-300{% endif %} hover:text-white transition-colors duration-300">Perfumes</a></li>
+                    <li><a href="{{ url_for('show_category', category_name='Roupas') }}" class="{% if category_title == 'Roupas' %}text-black dark:text-white font-semibold{% else %}text-gray-600 dark:text-gray-300{% endif %} hover:text-black dark:hover:text-white transition-colors duration-300">Roupas</a></li>
+                    <li><a href="{{ url_for('show_category', category_name='Sapatos') }}" class="{% if category_title == 'Sapatos' %}text-black dark:text-white font-semibold{% else %}text-gray-600 dark:text-gray-300{% endif %} hover:text-black dark:hover:text-white transition-colors duration-300">Sapatos</a></li>
+                    <li><a href="{{ url_for('show_category', category_name='Acessórios') }}" class="{% if category_title == 'Acessórios' %}text-black dark:text-white font-semibold{% else %}text-gray-600 dark:text-gray-300{% endif %} hover:text-black dark:hover:text-white transition-colors duration-300">Acessórios</a></li>
                 </ul>
             </div>
 
             <!-- Ícones da direita -->
             <div class="flex items-center space-x-5">
+                <!-- Theme Toggle Button -->
+                <button id="theme-toggle" type="button" class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 rounded-lg text-sm p-2.5">
+                    <svg id="theme-toggle-dark-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
+                    <svg id="theme-toggle-light-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 5.05a1 1 0 010 1.414l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 0zM3 11a1 1 0 100-2H2a1 1 0 100 2h1z" fill-rule="evenodd" clip-rule="evenodd"></path></svg>
+                </button>
                 <!-- Cart Icon -->
-                <a href="{{ url_for('cart') }}" class="relative text-gray-300 hover:text-white transition-colors duration-300">
+                <a href="{{ url_for('cart') }}" class="relative text-gray-500 dark:text-gray-300 hover:text-black dark:hover:text-white transition-colors duration-300">
                     <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" class="bi bi-cart" viewBox="0 0 16 16"><path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5zM3.102 4l1.313 7h8.17l1.313-7H3.102zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/></svg>
                     {% if session.get('cart') %}
                     <span class="absolute -top-2 -right-3 flex h-5 w-5 items-center justify-center rounded-full bg-red-600 text-xs font-bold text-white">
@@ -109,23 +119,22 @@
                     {% endif %}
                 </a>
                 <!-- Support Icon -->
-                <a href="tel:+5537991224643" class="text-2xl text-gray-300 hover:text-white transition-colors duration-300" title="Suporte">
+                <a href="tel:+5537991224643" class="text-2xl text-gray-500 dark:text-gray-300 hover:text-black dark:hover:text-white transition-colors duration-300" title="Suporte">
                     🎧
                 </a>
                 <!-- Hamburger Button -->
-                <button id="hamburger-button" class="md:hidden text-gray-300 hover:text-white focus:outline-none">
+                <button id="hamburger-button" class="md:hidden text-gray-500 dark:text-gray-300 hover:text-black dark:hover:text-white focus:outline-none">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
                 </button>
             </div>
         </nav>
 
         <!-- Mobile Menu -->
-        <div id="mobile-menu" class="hidden md:hidden bg-black/80">
+        <div id="mobile-menu" class="hidden md:hidden bg-white/95 dark:bg-black/95">
             <ul class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-                <li><a href="{{ url_for('index') }}" class="block px-3 py-2 rounded-md text-base font-medium {% if category_title == 'Todos os Produtos' %}text-white bg-gray-700{% else %}text-gray-300 hover:text-white hover:bg-gray-700{% endif %}">Todos</a></li>
-                <li><a href="{{ url_for('show_category', category_name='Promoções') }}" class="block px-3 py-2 rounded-md text-base font-medium {% if category_title == 'Promoções' %}text-white bg-gray-700{% else %}text-gray-300 hover:text-white hover:bg-gray-700{% endif %}">Promoções</a></li>
-                <li><a href="{{ url_for('show_category', category_name='Pods') }}" class="block px-3 py-2 rounded-md text-base font-medium {% if category_title == 'Pods' %}text-white bg-gray-700{% else %}text-gray-300 hover:text-white hover:bg-gray-700{% endif %}">Pods</a></li>
-                <li><a href="{{ url_for('show_category', category_name='Perfumes') }}" class="block px-3 py-2 rounded-md text-base font-medium {% if category_title == 'Perfumes' %}text-white bg-gray-700{% else %}text-gray-300 hover:text-white hover:bg-gray-700{% endif %}">Perfumes</a></li>
+                <li><a href="{{ url_for('show_category', category_name='Roupas') }}" class="block px-3 py-2 rounded-md text-base font-medium {% if category_title == 'Roupas' %}text-white bg-gray-900{% else %}text-gray-700 dark:text-gray-300 hover:text-white hover:bg-gray-700{% endif %}">Roupas</a></li>
+                <li><a href="{{ url_for('show_category', category_name='Sapatos') }}" class="block px-3 py-2 rounded-md text-base font-medium {% if category_title == 'Sapatos' %}text-white bg-gray-900{% else %}text-gray-700 dark:text-gray-300 hover:text-white hover:bg-gray-700{% endif %}">Sapatos</a></li>
+                <li><a href="{{ url_for('show_category', category_name='Acessórios') }}" class="block px-3 py-2 rounded-md text-base font-medium {% if category_title == 'Acessórios' %}text-white bg-gray-900{% else %}text-gray-700 dark:text-gray-300 hover:text-white hover:bg-gray-700{% endif %}">Acessórios</a></li>
             </ul>
         </div>
     </header>
@@ -135,10 +144,10 @@
     </main>
 
     <!-- Footer -->
-    <footer class="border-t border-gray-800">
+    <footer class="border-t border-gray-200 dark:border-gray-800 transition-colors duration-300">
         <div class="container mx-auto px-6 py-4">
-            <p class="text-center text-gray-500 text-sm">
-                <a href="{{ url_for('login') }}" class="hover:text-white transition-colors" title="Admin Login">&copy;</a> 2024 Draw Vapes. Todos os direitos reservados.
+            <p class="text-center text-gray-500 dark:text-gray-400 text-sm">
+                <a href="{{ url_for('login') }}" class="hover:text-black dark:hover:text-white transition-colors" title="Admin Login">&copy;</a> 2024 Jesko Brechó. Todos os direitos reservados.
             </p>
         </div>
     </footer>
@@ -181,6 +190,38 @@
         hamburgerButton.addEventListener('click', () => {
             mobileMenu.classList.toggle('hidden');
         });
+
+        // Theme toggle logic
+        const themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');
+        const themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
+        const themeToggleButton = document.getElementById('theme-toggle');
+
+        // Function to apply theme
+        const applyTheme = (theme) => {
+            if (theme === 'dark') {
+                document.documentElement.classList.add('dark');
+                themeToggleLightIcon.classList.remove('hidden');
+                themeToggleDarkIcon.classList.add('hidden');
+            } else {
+                document.documentElement.classList.remove('dark');
+                themeToggleDarkIcon.classList.remove('hidden');
+                themeToggleLightIcon.classList.add('hidden');
+            }
+        };
+
+        // Check for saved theme in localStorage or system preference
+        const savedTheme = localStorage.getItem('color-theme');
+        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+        applyTheme(savedTheme || (systemPrefersDark ? 'dark' : 'light'));
+
+        themeToggleButton.addEventListener('click', function() {
+            const isDarkMode = document.documentElement.classList.contains('dark');
+            const newTheme = isDarkMode ? 'light' : 'dark';
+            localStorage.setItem('color-theme', newTheme);
+            applyTheme(newTheme);
+        });
+
     </script>
     {% block scripts %}{% endblock %}
 </body>

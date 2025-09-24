@@ -7,7 +7,7 @@
         <button type="button" data-modal-target="addProductModal" class="open-modal-button bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition-colors">
             + Adicionar Produto
         </button>
-        <a href="{{ url_for('manage_flavors') }}" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded transition-colors">Gerenciar Sabores</a>
+        <a href="{{ url_for('manage_flavors') }}" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded transition-colors">Gerenciar Tamanhos</a>
         <a href="{{ url_for('logout') }}" class="bg-gray-800 hover:bg-gray-700 text-gray-300 font-bold py-2 px-4 rounded border border-gray-600 transition-colors">Logout</a>
     </div>
 </div>
@@ -48,7 +48,7 @@
 <!-- Modal: Adicionar Produto -->
 <div id="addProductModal" class="modal-container fixed inset-0 bg-black bg-opacity-70 backdrop-blur-sm flex items-center justify-center z-[100] hidden p-4">
     <div class="modal-content bg-[#1c1c1c] text-white rounded-lg shadow-xl w-full max-w-lg m-4 transform transition-all duration-300 ease-in-out scale-95 opacity-0">
-            <form action="{{ url_for('add_product') }}" method="post">
+            <form action="{{ url_for('add_product') }}" method="post" enctype="multipart/form-data">
                 <div class="flex justify-between items-center p-5 border-b border-gray-700">
                     <h5 class="text-xl font-semibold">Adicionar Novo Produto</h5>
                     <button type="button" class="close-modal-button text-gray-400 hover:text-white text-3xl leading-none">&times;</button>
@@ -69,14 +69,14 @@
                     <div>
                         <label for="category" class="block mb-2 text-sm font-medium text-gray-300">Categoria</label>
                         <select name="category" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" required>
-                            <option value="Promoções" selected>Promoções</option>
-                            <option value="Pods">Pods</option>
-                            <option value="Perfumes">Perfumes</option>
+                            <option value="Roupas" selected>Roupas</option>
+                            <option value="Sapatos">Sapatos</option>
+                            <option value="Acessórios">Acessórios</option>
                         </select>
                     </div>
                     <div>
-                        <label for="image_url" class="block mb-2 text-sm font-medium text-gray-300">URL da Imagem</label>
-                        <input type="text" name="image_url" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                        <label for="image_file" class="block mb-2 text-sm font-medium text-gray-300">Imagem do Produto</label>
+                        <input type="file" name="image_file" accept="image/png, image/jpeg, image/jpg, image/webp" class="block w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700 transition-colors cursor-pointer">
                     </div>
                     <div>
                         <label class="block mb-2 text-sm font-medium text-gray-300">Sabores Disponíveis</label>
@@ -107,39 +107,45 @@
 </div>
 
 <!-- Modais de Edição e Deleção -->
-{% for product in products %}
+{% for p in products %}
 <!-- Modal: Editar Produto -->
-<div id="editProductModal-{{ product.id }}" class="modal-container fixed inset-0 bg-black bg-opacity-70 backdrop-blur-sm flex items-center justify-center z-[100] hidden p-4">
+<div id="editProductModal-{{ p.id }}" class="modal-container fixed inset-0 bg-black bg-opacity-70 backdrop-blur-sm flex items-center justify-center z-[100] hidden p-4">
     <div class="modal-content bg-[#1c1c1c] text-white rounded-lg shadow-xl w-full max-w-lg m-4 transform transition-all duration-300 ease-in-out scale-95 opacity-0">
-            <form action="{{ url_for('edit_product', product_id=product.id) }}" method="post">
+            <form action="{{ url_for('edit_product', product_id=p.id) }}" method="post" enctype="multipart/form-data">
                 <div class="flex justify-between items-center p-5 border-b border-gray-700">
-                    <h5 class="text-xl font-semibold">Editar Produto: {{ product.name }}</h5>
+                    <h5 class="text-xl font-semibold">Editar Produto: {{ p.name }}</h5>
                     <button type="button" class="close-modal-button text-gray-400 hover:text-white text-3xl leading-none">&times;</button>
                 </div>
                 <div class="p-5 space-y-4">
                     <div>
                         <label class="block mb-2 text-sm font-medium text-gray-300">Nome do Produto</label>
-                        <input type="text" name="name" value="{{ product.name }}" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" required>
+                        <input type="text" name="name" value="{{ p.name }}" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" required>
                     </div>
                     <div>
                         <label class="block mb-2 text-sm font-medium text-gray-300">Descrição</label>
-                        <textarea name="description" rows="3" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" required>{{ product.description }}</textarea>
+                        <textarea name="description" rows="3" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" required>{{ p.description }}</textarea>
                     </div>
                     <div>
                         <label class="block mb-2 text-sm font-medium text-gray-300">Preço</label>
-                        <input type="number" step="0.01" name="price" value="{{ product.price }}" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" required>
+                        <input type="number" step="0.01" name="price" value="{{ p.price }}" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" required>
                     </div>
                     <div>
                         <label class="block mb-2 text-sm font-medium text-gray-300">Categoria</label>
                         <select name="category" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" required>
-                            <option value="Promoções" {% if product.category == 'Promoções' %}selected{% endif %}>Promoções</option>
-                            <option value="Pods" {% if product.category == 'Pods' %}selected{% endif %}>Pods</option>
-                            <option value="Perfumes" {% if product.category == 'Perfumes' %}selected{% endif %}>Perfumes</option>
+                            <option value="Roupas" {% if p.category == 'Roupas' %}selected{% endif %}>Roupas</option>
+                            <option value="Sapatos" {% if p.category == 'Sapatos' %}selected{% endif %}>Sapatos</option>
+                            <option value="Acessórios" {% if p.category == 'Acessórios' %}selected{% endif %}>Acessórios</option>
                         </select>
                     </div>
                     <div>
-                        <label class="block mb-2 text-sm font-medium text-gray-300">URL da Imagem</label>
-                        <input type="text" name="image_url" value="{{ product.image_url }}" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                        <label class="block mb-2 text-sm font-medium text-gray-300">Alterar Imagem do Produto</label>
+                        {% if p.image_url %}
+                        <div class="my-2">
+                            <img src="{{ p.image_url }}" alt="Imagem atual" class="h-24 w-24 object-cover rounded-md inline-block">
+                            <input type="hidden" name="current_image_url" value="{{ p.image_url }}">
+                        </div>
+                        {% endif %}
+                        <input type="file" name="image_file" accept="image/png, image/jpeg, image/jpg, image/webp" class="block w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700 transition-colors cursor-pointer">
                     </div>
                     <div>
                         <label class="block mb-2 text-sm font-medium text-gray-300">Sabores Disponíveis</label>
@@ -147,12 +153,12 @@
                             {% for flavor in all_flavors %}
                             <div class="flex items-center justify-between">
                                 <div class="flex items-center">
-                                    <input id="edit-flavor-{{ product.id }}-{{ flavor.id }}" type="checkbox" name="flavors" value="{{ flavor.id }}" class="w-4 h-4 text-blue-600 bg-gray-800 border-gray-500 rounded focus:ring-blue-600 ring-offset-gray-700 focus:ring-2" {% if flavor.id in product.flavors_stock %}checked{% endif %}>
-                                    <label for="edit-flavor-{{ product.id }}-{{ flavor.id }}" class="ml-2 text-sm font-medium text-gray-300">{{ flavor.name }}</label>
+                                    <input id="edit-flavor-{{ p.id }}-{{ flavor.id }}" type="checkbox" name="flavors" value="{{ flavor.id }}" class="w-4 h-4 text-blue-600 bg-gray-800 border-gray-500 rounded focus:ring-blue-600 ring-offset-gray-700 focus:ring-2" {% if flavor.id in p.flavors_stock %}checked{% endif %}>
+                                    <label for="edit-flavor-{{ p.id }}-{{ flavor.id }}" class="ml-2 text-sm font-medium text-gray-300">{{ flavor.name }}</label>
                                 </div>
                                 <div class="flex items-center">
-                                    <label for="edit-stock-{{ product.id }}-{{ flavor.id }}" class="text-xs text-gray-400 mr-2">Estoque:</label>
-                                    <input type="number" name="stock_{{ flavor.id }}" id="edit-stock-{{ product.id }}-{{ flavor.id }}" value="{{ product.flavors_stock.get(flavor.id, 0) }}" min="0" class="w-20 bg-gray-800 border border-gray-600 text-white text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-1.5">
+                                    <label for="edit-stock-{{ p.id }}-{{ flavor.id }}" class="text-xs text-gray-400 mr-2">Estoque:</label>
+                                    <input type="number" name="stock_{{ flavor.id }}" id="edit-stock-{{ p.id }}-{{ flavor.id }}" value="{{ p.flavors_stock.get(flavor.id, 0) }}" min="0" class="w-20 bg-gray-800 border border-gray-600 text-white text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-1.5">
                                 </div>
                             </div>
                             {% else %}
@@ -170,18 +176,18 @@
 </div>
 
 <!-- Modal: Deletar Produto -->
-<div id="deleteProductModal-{{ product.id }}" class="modal-container fixed inset-0 bg-black bg-opacity-70 backdrop-blur-sm flex items-center justify-center z-[100] hidden p-4">
+<div id="deleteProductModal-{{ p.id }}" class="modal-container fixed inset-0 bg-black bg-opacity-70 backdrop-blur-sm flex items-center justify-center z-[100] hidden p-4">
     <div class="modal-content bg-[#1c1c1c] text-white rounded-lg shadow-xl w-full max-w-md m-4 transform transition-all duration-300 ease-in-out scale-95 opacity-0">
             <div class="p-5 text-center">
                 <svg class="mx-auto mb-4 text-gray-400 w-12 h-12" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
                     <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 11V6m0 8h.01M19 10a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
                 </svg>
-                <h3 class="mb-5 text-lg font-normal text-gray-400">Você tem certeza que deseja excluir o produto "{{ product.name }}"?</h3>
+                <h3 class="mb-5 text-lg font-normal text-gray-400">Você tem certeza que deseja excluir o produto "{{ p.name }}"?</h3>
                 <p class="text-danger">Esta ação não pode ser desfeita.</p>
             </div>
             <div class="flex justify-center items-center p-5 bg-[#111111] rounded-b-lg space-x-4">
                 <button type="button" class="close-modal-button px-6 py-2 bg-gray-600 hover:bg-gray-500 rounded-md transition-colors">Cancelar</button>
-                <form action="{{ url_for('delete_product', product_id=product.id) }}" method="post" style="display: inline;">
+                <form action="{{ url_for('delete_product', product_id=p.id) }}" method="post" style="display: inline;">
                     <button type="submit" class="px-6 py-2 bg-red-600 hover:bg-red-700 rounded-md transition-colors">Sim, Excluir</button>
                 </form>
             </div>

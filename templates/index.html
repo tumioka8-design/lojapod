@@ -8,133 +8,122 @@
 <div class="grid grid-cols-2 gap-4 lg:grid-cols-3 xl:grid-cols-4">
     {% for product in products %}
     <!-- Card de Produto -->
-    <div class="bg-[#111111] rounded-lg overflow-hidden group transition-transform duration-300 ease-in-out hover:-translate-y-2 shadow-glow flex flex-col">
+    <div class="bg-gray-50 dark:bg-[#111111] rounded-lg overflow-hidden group transition-transform duration-300 ease-in-out hover:-translate-y-2 shadow-glow flex flex-col">
         <div class="relative">
             <img src="{{ product.image_url or 'https://placehold.co/400x400/111111/FFFFFF?text=Sem+Imagem' }}" alt="{{ product.name }}" class="w-full h-64 object-cover">
         </div>
         <div class="p-5 flex flex-col flex-grow">
-            <h3 class="text-lg font-semibold mb-2 truncate flex-grow" title="{{ product.name }}">{{ product.name }}</h3>
+            <h3 class="text-lg font-semibold mb-1 truncate" title="{{ product.name }}">{{ product.name }}</h3>
+            {% if product.flavors %}
+            <p class="text-xs text-gray-500 dark:text-gray-400 mb-2 flex-grow">{{ product.flavors|join(', ') }}</p>
+            {% else %}
+            <div class="flex-grow"></div>
+            {% endif %}
             <div class="flex justify-between items-center mt-4">
                 <div class="flex items-baseline space-x-2">
                     <p class="text-2xl font-bold">R$ {{ "%.2f"|format(product.price) }}</p>
                 </div>
-                <button 
-                    class="open-modal-button bg-white text-black rounded-full w-10 h-10 flex items-center justify-center text-2xl font-light hover:bg-gray-200 transition-colors duration-300"
-                    data-product-id="{{ product.id }}"
-                    data-product-name="{{ product.name }}"
-                    data-product-image="{{ product.image_url or 'https://placehold.co/400x300/1c1c1c/FFFFFF?text=Sem+Imagem' }}"
-                    data-product-flavors="{{ product.flavors|join(',') }}"
-                    data-product-has-flavors="{{ 'true' if product.has_flavors else 'false' }}">
+                <button type="button" data-modal-target="productModal-{{ product.id }}" class="open-modal-button bg-black dark:bg-white text-white dark:text-black rounded-full w-10 h-10 flex items-center justify-center text-2xl font-light hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors duration-300">
                     +
                 </button>
             </div>
         </div>
     </div>
+
+    <!-- Modal de Produto -->
+    <div id="productModal-{{ product.id }}" class="modal-container fixed inset-0 bg-black bg-opacity-70 backdrop-blur-sm flex items-center justify-center z-[100] hidden p-4">
+        <div class="modal-content bg-[#1c1c1c] text-white rounded-lg shadow-xl w-full max-w-lg m-4 transform transition-all duration-300 ease-in-out scale-95 opacity-0">
+            <form action="{{ url_for('add_to_cart') }}" method="post">
+                <div class="flex justify-between items-center p-5 border-b border-gray-700">
+                    <h5 class="text-xl font-semibold">{{ product.name }}</h5>
+                    <button type="button" class="close-modal-button text-gray-400 hover:text-white text-3xl leading-none">&times;</button>
+                </div>
+                <div class="p-5 space-y-4">
+                    <div>
+                        <p class="text-gray-400">{{ product.description }}</p>
+                    </div>
+                    {% if product.has_flavors %}
+                    <div>
+                        
+                        <div class="flex flex-wrap gap-2">
+                            {% for flavor in product.flavors %}
+                            <div class="flex items-center">
+                                <input type="radio" id="flavor-{{ product.id }}-{{ flavor }}" name="flavor" value="{{ flavor }}" class="hidden peer">
+                                <label for="flavor-{{ product.id }}-{{ flavor }}" class="inline-flex items-center justify-center w-full px-4 py-2 text-sm font-medium text-gray-300 bg-gray-700 border-2 border-gray-700 rounded-lg cursor-pointer hover:text-white hover:bg-gray-600 peer-checked:border-blue-500 peer-checked:text-blue-300 transition-colors">
+                                    {{ flavor }}
+                                </label>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="flex justify-end items-center p-5 bg-[#111111] rounded-b-lg space-x-4">
+                    <input type="hidden" name="product_id" value="{{ product.id }}">
+                    <button type="button" class="close-modal-button px-6 py-2 bg-gray-600 hover:bg-gray-500 rounded-md transition-colors">Cancelar</button>
+                    <button type="submit" class="px-6 py-2 bg-blue-600 hover:bg-blue-500 rounded-md transition-colors">Adicionar ao Carrinho</button>
+                </div>
+            </form>
+        </div>
+    </div>
     {% else %}
     <div class="sm:col-span-2 lg:col-span-3 xl:col-span-4">
-        <div class="bg-[#111111] text-center py-16 px-6 rounded-lg shadow-glow">
-            <h3 class="text-2xl font-semibold text-gray-300">Nenhum produto encontrado na categoria "{{ category_title }}".</h3>
-            <p class="text-gray-500 mt-3">Volte em breve para conferir as novidades!</p>
+        <div class="bg-gray-50 dark:bg-[#111111] text-center py-16 px-6 rounded-lg shadow-glow">
+            <h3 class="text-2xl font-semibold text-gray-600 dark:text-gray-300">Nenhum produto encontrado na categoria "{{ category_title }}".</h3>
+            <p class="text-gray-500 dark:text-gray-500 mt-3">Volte em breve para conferir as novidades!</p>
         </div>
     </div>
     {% endfor %}
 </div>
 
-<!-- Modal de Seleção de Sabor (Tailwind) -->
-<div id="flavorModal" class="fixed inset-0 bg-black bg-opacity-70 backdrop-blur-sm flex items-center justify-center z-[100] hidden p-4">
-    <div class="bg-[#1c1c1c] text-white rounded-lg shadow-xl w-full max-w-md m-4 transform transition-all duration-300 ease-in-out scale-95 opacity-0" id="modalContent">
-        <form action="{{ url_for('add_to_cart') }}" method="post">
-            <div class="flex justify-between items-center p-5 border-b border-gray-700">
-                <h5 class="text-xl font-semibold" id="flavorModalLabel">Selecione o Sabor</h5>
-                <button type="button" class="close-modal-button text-gray-400 hover:text-white text-3xl leading-none">&times;</button>
-            </div>
-            <div class="p-5">
-                <input type="hidden" name="product_id" id="modalProductId">
-                <div class="text-center mb-4">
-                    <img id="modalProductImage" src="" class="mx-auto rounded-lg" style="max-height: 200px;" alt="Imagem do Produto">
-                </div>
-                <p class="mb-4">Escolha um dos sabores disponíveis para <strong><span id="modalProductName"></span></strong>:</p>
-                <div id="modalFlavorList" class="space-y-2 max-h-40 overflow-y-auto">
-                    <!-- Sabores serão inseridos aqui pelo JavaScript -->
-                </div>
-            </div>
-            <div class="flex justify-end items-center p-5 bg-[#111111] rounded-b-lg space-x-4">
-                <button type="button" class="close-modal-button px-6 py-2 bg-gray-600 hover:bg-gray-500 rounded-md transition-colors">Fechar</button>
-                <button type="submit" class="px-6 py-2 bg-blue-600 hover:bg-blue-500 rounded-md transition-colors">Adicionar ao Carrinho</button>
-            </div>
-        </form>
-    </div>
-</div>
 {% endblock %}
 
 {% block scripts %}
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    const flavorModal = document.getElementById('flavorModal');
-    const submitButton = flavorModal.querySelector('button[type="submit"]');
-    const modalContent = document.getElementById('modalContent');
     const openModalButtons = document.querySelectorAll('.open-modal-button');
     const closeModalButtons = document.querySelectorAll('.close-modal-button');
 
-    const openModal = (event) => {
-        const button = event.currentTarget;
-
-        // Reset and enable submit button by default
-        submitButton.disabled = false;
-        submitButton.classList.remove('opacity-50', 'cursor-not-allowed');
-
-        // Preencher dados do modal
-        document.getElementById('modalProductId').value = button.dataset.productId;
-        document.getElementById('modalProductName').textContent = button.dataset.productName;
-        document.getElementById('modalProductImage').src = button.dataset.productImage;
-
-        const flavorList = document.getElementById('modalFlavorList');
-        flavorList.innerHTML = '';
-        const flavors = button.dataset.productFlavors;
-        const hasFlavors = button.dataset.productHasFlavors === 'true';
-
-        if (flavors) {
-            flavors.split(',').forEach((flavor, index) => {
-                const isChecked = index === 0 ? 'checked' : '';
-                const flavorHTML = `
-                    <label for="flavor-${index}" class="flex items-center p-3 rounded-lg hover:bg-gray-700 cursor-pointer transition-colors">
-                        <input class="w-4 h-4 text-blue-600 bg-gray-700 border-gray-600 focus:ring-blue-600 ring-offset-gray-800 focus:ring-2" type="radio" name="flavorSelection" id="flavor-${index}" value="${flavor}" ${isChecked} required>
-                        <span class="ml-3 text-sm font-medium text-gray-300">${flavor}</span>
-                    </label>`;
-                flavorList.insertAdjacentHTML('beforeend', flavorHTML);
-            });
-        } else if (hasFlavors) {
-            flavorList.innerHTML = '<p class="text-gray-400">Nenhum sabor disponível em estoque no momento.</p>';
-            submitButton.disabled = true;
-            submitButton.classList.add('opacity-50', 'cursor-not-allowed');
-        } else {
-            flavorList.innerHTML = '<p class="text-gray-400">Este produto não possui sabores específicos.</p>';
-            submitButton.disabled = true;
-            submitButton.classList.add('opacity-50', 'cursor-not-allowed');
-        }
-
-        // Mostrar o modal com animação
-        flavorModal.classList.remove('hidden');
+    const openModal = (modal) => {
+        if (!modal) return;
+        const modalContent = modal.querySelector('.modal-content');
+        modal.classList.remove('hidden');
         setTimeout(() => {
-            modalContent.classList.remove('scale-95', 'opacity-0');
-        }, 10); // Pequeno delay para garantir que a transição CSS seja aplicada
+            if(modalContent) modalContent.classList.remove('scale-95', 'opacity-0');
+        }, 10);
     };
 
-    const closeModal = () => {
-        modalContent.classList.add('scale-95', 'opacity-0');
+    const closeModal = (modal) => {
+        if (!modal) return;
+        const modalContent = modal.querySelector('.modal-content');
+        if(modalContent) modalContent.classList.add('scale-95', 'opacity-0');
         setTimeout(() => {
-            flavorModal.classList.add('hidden');
-        }, 300); // Duração da animação
+            modal.classList.add('hidden');
+        }, 300);
     };
 
-    openModalButtons.forEach(button => button.addEventListener('click', openModal));
-    closeModalButtons.forEach(button => button.addEventListener('click', closeModal));
+    openModalButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const modalId = button.getAttribute('data-modal-target');
+            const modal = document.getElementById(modalId);
+            openModal(modal);
+        });
+    });
 
-    // Fechar modal ao clicar fora do conteúdo
-    flavorModal.addEventListener('click', (event) => {
-        if (event.target === flavorModal) {
-            closeModal();
-        }
+    closeModalButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const modal = button.closest('.modal-container');
+            closeModal(modal);
+        });
+    });
+
+    // Close modal on outside click
+    document.querySelectorAll('.modal-container').forEach(modal => {
+        modal.addEventListener('click', (event) => {
+            if (event.target === modal) {
+                closeModal(modal);
+            }
+        });
     });
 });
 </script>
